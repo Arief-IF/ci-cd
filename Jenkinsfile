@@ -6,8 +6,8 @@ pipeline {
             steps {
                 // Ganti dengan ID kredensial, URL, dan nama branch Anda
                 git branch: 'main', 
-                    credentialsId: 'my-github-pat-id', 
-                    url: 'https://github.com/YOUR_USER/ci-cd-ujian-html.git'
+                    credentialsId: 'github-credential', 
+                    url: 'https://github.com/Arief-IF/ci-cd.git'
             }
         }
 
