@@ -4,32 +4,34 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Ganti dengan ID kredensial, URL, dan nama branch Anda
+                echo '1. Mengambil kode dari GitHub...'
+                // Pastikan ID ini sudah benar di Jenkins Credential Anda
                 git branch: 'main', 
                     credentialsId: 'github-credential', 
-                    url: 'https://github.com/Arief-IF/ci-cd.git'
+                    url: 'https://github.com/Arief-IF/ci-cd.git' 
             }
         }
 
         stage('Verification & Deployment') {
             steps {
-                echo '1. Memverifikasi file HTML...'
-                // Langkah verifikasi sederhana
-                sh 'ls -l index.html' 
+                echo '2. Mempersiapkan direktori deployment (C:\\staging)...'
+                // Ganti: sh 'mkdir -p C:\\staging' -> Menggunakan bat (Windows)
+                bat 'if not exist C:\\staging mkdir C:\\staging'
 
-                echo '2. Simulasi Deployment...'
-                // Gunakan perintah shell untuk menempatkan file di lokasi deployment (misal: C:\staging)
-                // (Asumsi: Anda menjalankan Jenkins di Windows, jadi ini akan dijalankan di lingkungan Windows/Container host)
-                sh 'mkdir -p C:\\staging'
-                sh 'cp index.html C:\\staging'
-                sh 'echo "Deployment ke C:\\staging/index.html selesai."'
+                echo '3. Menyalin index.html ke lokasi deployment...'
+                // Ganti: sh 'cp index.html C:\\staging' -> Menggunakan bat copy (Windows)
+                bat 'copy index.html C:\\staging' 
+                echo "Deployment ke C:\\staging selesai."
             }
         }
 
         stage('Post-Deployment Test') {
             steps {
-                // Tes sederhana untuk memverifikasi file ada di lokasi deployment
-                sh 'if [ -f C:\\staging/index.html ]; then echo "Verifikasi file SUKSES."; else exit 1; fi'
+                echo '4. Melakukan verifikasi pasca-deployment...'
+                // Ganti: sh 'if [ -f... ]' -> Menggunakan bat if exist (Windows)
+                bat 'if exist C:\\staging\\index.html ( echo "Verifikasi file SUKSES." ) else ( echo "Verifikasi file GAGAL! File tidak ditemukan." & exit /b 1 )'
+                
+                echo "Pipeline Deployment Berhasil untuk Build #${env.BUILD_NUMBER}!"
             }
         }
     }
